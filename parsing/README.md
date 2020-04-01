@@ -1,4 +1,7 @@
-﻿# 何に使うのか
+﻿# 概要
+ Herbert B. Enderton, *A Mathematical Introduction to Logic*, 2nd edition, Harcourt/Academic Press, 2001, 1972, p. 31 に載っている、命題論理の論理式の形成木を作るアルゴリズムをPythonで実装したものです。
+ 
+ # 何に使うのか
 
 命題論理の論理式っぽい文字列が手元にあり、それが統語論的にちゃんとした文字列かどうか知りたいとき、parsing.exeを使えば、その文字列が整式なのかどうか判定してくれます。さらに、整式であった場合には式の形成木を描いてpngファイルにして渡してくれます（ファイルはparsing.exeのあるディレクトリに保存されます）。
 
