@@ -1,2 +1,2 @@
-# hikari_sakurakawa
+# my_products
 作ったものです！
