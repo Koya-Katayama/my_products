@@ -1,39 +1,40 @@
-﻿# coding: utf-8
+# coding: utf-8
 
 import sys
 from graphviz import Graph
 
-G = Graph(format = 'png', filename = 'formationtree')
-G.attr('node', shape = 'box')
-notwff = False
+G = Graph(format='png', filename='formation_tree')
+G.attr('node', shape='box')
+not_wff = False
 
-class Node():
-    def __init__(self, root = None):
+
+class Node:
+    def __init__(self, root=None):
         self.value = root
         self.left = None
         self.right = None
         self.id = None
-    
-    def lappend(self, x):
-        self.left = Node(x)
-    
-    def rappend(self, y):
-        self.right = Node(y)
-        
 
-def notparsing(node):
-    global notwff
+    def left_append(self, x):
+        self.left = Node(x)
+
+    def right_append(self, y):
+        self.right = Node(y)
+
+
+def not_parsing(node):
+    global not_wff
+
     if len(node.value) == 4 and node.value[2] == 'A' and node.value[3] == ')':
-        node.lappend(['A'])
+        node.left_append(['A'])
         node.left.id = node.id + '1'
         G.node(node.left.id, ' '.join(node.left.value))
         G.edge(node.id, node.left.id)
         return
-    
-    flag = True
-    exind = -1
-    
-    while flag:   
+
+    ind = -1
+
+    while True:
         left = 0
         right = 0
         for i in range(2, len(node.value) - 1):
@@ -41,32 +42,30 @@ def notparsing(node):
                 left += 1
             elif node.value[i] == ')':
                 right += 1
-                        
+
             if left != 0 and left == right:
-                exind = i
-                flag = False
+                ind = i
                 break
-            elif (i == len(node.value) - 2 and  left != right) or left == right == 0:
+            elif (i == len(node.value) - 2 and left != right) or left == right == 0:
                 print('これは整式ではありません')
-                notwff = True
+                not_wff = True
                 return
-    
-                        
-        node.lappend(node.value[2:exind+1])
+
+        node.left_append(node.value[2:ind + 1])
         node.left.id = node.id + '1'
         G.node(node.left.id, ' '.join(node.left.value))
         G.edge(node.id, node.left.id)
-        
+
         return
-    
-            
-def binaryparsing(node):
-    global notwff
-    
-    if len(node.value) == 5 and node.value[1] == 'A' and node.value[2] in ['and','or','=>','<=>'] \
-    and node.value[3] == 'A' and node.value[4] == ')':
-        node.lappend(['A'])
-        node.rappend(['A'])
+
+
+def binary_parsing(node):
+    global not_wff
+
+    if len(node.value) == 5 and node.value[1] == 'A' and node.value[2] in ['and', 'or', '=>', '<=>'] \
+            and node.value[3] == 'A' and node.value[4] == ')':
+        node.left_append(['A'])
+        node.right_append(['A'])
         node.left.id = node.id + '1'
         G.node(node.left.id, ' '.join(node.left.value))
         node.right.id = node.id + '2'
@@ -74,22 +73,19 @@ def binaryparsing(node):
         G.edge(node.id, node.left.id)
         G.edge(node.id, node.right.id)
         return
-    
+
     if node.value[1] != '(' and node.value[1] != 'A':
         print('これは整式ではありません')
-        notwff = True
+        not_wff = True
         return
-    
-    flag = True
-    exind = -1
-    lefthalf = None
-    righthalf = None
-    
+
+    ind = -1
+
     if node.value[1] == 'A':
-        lefthalf = ['A']
-        exind = 1
+        left_half = ['A']
+        ind = 1
     else:
-        while flag:   
+        while True:
             left = 0
             right = 0
             for i in range(1, len(node.value) - 1):
@@ -97,31 +93,28 @@ def binaryparsing(node):
                     left += 1
                 elif node.value[i] == ')':
                     right += 1
-                        
+
                 if left != 0 and left == right:
-                    exind = i
-                    flag = False
+                    ind = i
                     break
-                elif (i == len(node.value) - 2 and  left != right) or left == right == 0:
+                elif (i == len(node.value) - 2 and left != right) or left == right == 0:
                     print('これは整式ではありません')
-                    notwff = True
+                    not_wff = True
                     return
-                        
-            lefthalf = node.value[1:exind+1]
+
+            left_half = node.value[1:ind + 1]
             break
-        
-    if not node.value[exind+1] in ['and','or','=>','<=>']:
+
+    if not node.value[ind + 1] in ['and', 'or', '=>', '<=>']:
         print('これは整式ではありません')
-        notwff = True
+        not_wff = True
         return
-    
-    flag = True
-    
+
     try:
-        if node.value[exind+2] == 'A' and node.value[exind+3] == ')' and len(node.value) == exind+4:
-            righthalf = ['A']
-            node.lappend(lefthalf)
-            node.rappend(righthalf)
+        if node.value[ind + 2] == 'A' and node.value[ind + 3] == ')' and len(node.value) == ind + 4:
+            right_half = ['A']
+            node.left_append(left_half)
+            node.right_append(right_half)
             node.left.id = node.id + '1'
             G.node(node.left.id, ' '.join(node.left.value))
             node.right.id = node.id + '2'
@@ -129,31 +122,30 @@ def binaryparsing(node):
             G.edge(node.id, node.left.id)
             G.edge(node.id, node.right.id)
             return
-    except:
+    except IndexError:
         pass
-            
-    while flag:   
+
+    while True:
         left = 0
         right = 0
-        for i in range(exind + 2, len(node.value) - 1):
+        for i in range(ind + 2, len(node.value) - 1):
             if node.value[i] == '(':
                 left += 1
             elif node.value[i] == ')':
                 right += 1
-                        
+
             if left != 0 and left == right:
-                flag = False
                 break
-            elif (i == len(node.value) - 2 and  left != right) or left == right == 0:
+            elif (i == len(node.value) - 2 and left != right) or left == right == 0:
                 print('これは整式ではありません')
-                notwff = True
+                not_wff = True
                 return
-                
-        righthalf = node.value[exind+2:len(node.value)-1]
+
+        right_half = node.value[ind + 2:len(node.value) - 1]
         break
-    
-    node.lappend(lefthalf)
-    node.rappend(righthalf)
+
+    node.left_append(left_half)
+    node.right_append(right_half)
     node.left.id = node.id + '1'
     G.node(node.left.id, ' '.join(node.left.value))
     node.right.id = node.id + '2'
@@ -161,47 +153,48 @@ def binaryparsing(node):
     G.edge(node.id, node.left.id)
     G.edge(node.id, node.right.id)
     return
-    
-fomula = Node([i for i in input('整式かどうか判定したい文字列を入力してください').split()])
-fomula.id = '0'
-vertices = [fomula]
-newvertices = []
-G.node(fomula.id, " ".join(fomula.value))
 
-try:
-    while True:
-        end = True
-        times = 0
-    
-        for i in vertices:
-            if i.value != ['A']:
-                end = False
+if __name__ == '__main__':
+    formula = Node([i for i in input('整式かどうか判定したい文字列を入力してください').split()])
+    formula.id = '0'
+    vertices = [formula]
+    new_vertices = []
+    G.node(formula.id, ' '.join(formula.value))
 
-        if end:
-            print('これは整式です')
-            G.view()
-            break
-    
-        for i in vertices:
-            if i.value[0] != '(' and i.value != ['A']:
-                sys.exit()
-        
-            if i.value != ['A'] and i.value[1] == 'not':
-                notparsing(i)
-                newvertices.append(i.left)
-            elif i.value != ['A']:
-                binaryparsing(i)
-                newvertices.append(i.left)
-                newvertices.append(i.right)
-            
-            if notwff:
+    try:
+        while True:
+            end = True
+            times = 0
+
+            for i in vertices:
+                if i.value != ['A']:
+                    end = False
+
+            if end:
+                print('これは整式です')
+                G.view()
                 break
-    
-        if notwff:
-            break
-            
-        vertices = newvertices
-        newvertices = []
 
-except:
-    print('これは整式ではありません')
+            for i in vertices:
+                if i.value[0] != '(' and i.value != ['A']:
+                    sys.exit()
+
+                if i.value != ['A'] and i.value[1] == 'not':
+                    not_parsing(i)
+                    new_vertices.append(i.left)
+                elif i.value != ['A']:
+                    binary_parsing(i)
+                    new_vertices.append(i.left)
+                    new_vertices.append(i.right)
+
+                if not_wff:
+                    break
+
+            if not_wff:
+                break
+
+            vertices = new_vertices
+            new_vertices = []
+
+    except IndexError:
+        print('これは整式ではありません')
