@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+        <h1>Delete Book Review</h1>
+        <p>Are you sure you want to delete '{{ object.name }}'?</p>
+        <form action='' method='post'>{% csrf_token %}
+            {{ form.as_p }}
+            <button type='submit' class='submit delete'>Delete</button>
+        </form>
+        <div>
+            <a href='JavaScript:history.back()'>&lt; Back</a>
+        </div>
+{% endblock %}

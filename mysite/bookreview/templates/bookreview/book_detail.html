@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+        <h1>{{ book.name }}</h1>
+        <div>
+            <p>Author: {{ book.books_author }}</p>
+            <p>Genre: {{ book.category.name }}</p>
+            <p>Publisher: {{ book.publisher }}</p>
+            <p>Review: {{ book.review }}</p>
+        </div>
+        <div>
+            <a href='{% url "bookreview:index" %}'>Back</a>
+            {% if request.user.id == object.author_id %}
+             | <a href='{% url "bookreview:update" book.pk %}'>Edit</a>
+             | <a href='{% url "bookreview:delete" book.pk %}'>Delete</a>
+            {% endif %}
+        </div>
+{% endblock %}
